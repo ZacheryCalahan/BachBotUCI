@@ -9,8 +9,6 @@ using System.Threading.Tasks;
 namespace BachBotUCI.Utilities {
     public static class FenUtility {
         public const string StartPositionFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-        public static int[] squares = new int[64];
-        public static bool IsWhitesTurn;
 
         public static PositionInfo loadFen(string fen = StartPositionFEN) {
             PositionInfo positionInfo = new PositionInfo(fen);
@@ -25,7 +23,7 @@ namespace BachBotUCI.Utilities {
                 int numEmptyFiles = 0;
                 for (int file = 0; file < 8; file++) {
                     int i = rank * 8 + file;
-                    int piece = board.squares[i];
+                    int piece = board.Squares[i];
                     if (piece != 0) {
                         if (numEmptyFiles != 0) {
                             fen += numEmptyFiles;
@@ -69,9 +67,39 @@ namespace BachBotUCI.Utilities {
 
             //Side to move
             fen += ' ';
-            fen += (board.IsWhiteToPlay()) ? 'w' : 'b';
+            fen += (board.WhiteToMove) ? 'w' : 'b';
 
-            // TODO implement castling rights, en passant, and draw conditions.
+            // Castling Rights
+            bool whiteKingside = (board.GameState.castlingRights & 1) == 1;
+            bool whiteQueenside = (board.GameState.castlingRights >> 1 & 1) == 1;
+            bool blackKingside = (board.GameState.castlingRights >> 2 & 1) == 1;
+            bool blackQueenside = (board.GameState.castlingRights >> 3  & 1) == 1;
+            fen += ' ';
+            fen += (whiteKingside) ? "K" : "";
+            fen += (whiteQueenside) ? "Q" : "";
+            fen += (blackKingside) ? "k" : "";
+            fen += (blackQueenside) ? "q" : "";
+            fen += ((board.GameState.castlingRights) == 0) ? "-" : "";
+
+            // Enpassant
+            fen += ' ';
+            int epFileIndex = board.GameState.enPassantFile - 1;
+            int epRankIndex = (board.WhiteToMove) ? 5 : 2;
+
+            bool isEnPassant = epFileIndex != -1;
+            if (board.GameState.enPassantFile != 0) {
+                fen += BoardUtility.fileNames.IndexOf(board.GameState.enPassantFile + 1 + "");
+            } else {
+                fen += "-";
+            }
+
+            // 50 Move Counter
+            fen += ' ';
+            fen += board.GameState.fiftyMoveCounter;
+
+            // Total Move Counter
+            fen += ' ';
+            fen += (board.PlyCount / 2) + 1;
 
             return fen;
         }
@@ -82,21 +110,21 @@ namespace BachBotUCI.Utilities {
             // Board Representation
             public readonly ReadOnlyCollection<int> squares;
 
-            // Who to move
+            // Gamestate
             public readonly bool whiteToMove;
-
-            // TODO Castling Rights
-            
-            // TODO Draw conditions (50 move, repetition count, etc.)
-
-            // TODO Enpassant condtions
+            public readonly int castlingRights = 0;
+            public readonly int epFile = 0;
+            public readonly int fiftyMovePlyCount = 0;
+            public readonly int moveCount = 0;
 
             public PositionInfo(string fen) {
+                // Position Info
                 this.fen = fen;
                 int[] squarePieces = new int[64];
-
+                
+                // Get the pieces on the board
                 string[] fenTokens = fen.Split(' ');
-
+                
                 int file = 0;
                 int rank = 7;
 
@@ -127,12 +155,50 @@ namespace BachBotUCI.Utilities {
                 squares = new(squarePieces);
                 whiteToMove = (fenTokens[1] == "w");
 
-                // TODO castling rights, enpassant file, and draw conditions.
+                // Castling Rights
+                if (!fenTokens[2].Contains("-")) {
+                    char[] castleChars = fenTokens[2].ToCharArray();
+                    foreach (char castleChar in castleChars) {
+                        switch (castleChar) {
+                            case 'K':
+                                castlingRights |= 0b0001;
+                                break;
+                            case 'Q':
+                                castlingRights |= 0b0010;
+                                break;
+                            case 'k':
+                                castlingRights |= 0b0100;
+                                break;
+                            case 'q':
+                                castlingRights |= 0b1000;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+
+                // Enpassant File
+                if (fenTokens.Length > 3) {
+                    // Enpassant file
+                    if (!fenTokens[3].Contains("-")) {
+                        string enPassantFileName = fenTokens[3][0].ToString();
+                        if (BoardUtility.fileNames.Contains(enPassantFileName)) {
+                            epFile = BoardUtility.fileNames.IndexOf(enPassantFileName) + 1;
+                        }
+                    }
+                }
+                
+                // 50 Move Rule
+                if (fenTokens.Length > 4) {
+                    int.TryParse(fenTokens[4], out fiftyMovePlyCount);
+                }
+
+                // Full Move Count
+                if (fenTokens.Length > 5) {
+                    int.TryParse(fenTokens[5], out moveCount);
+                }
             }
-
-
         }
-
-
     }
 }

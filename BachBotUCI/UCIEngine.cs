@@ -34,7 +34,6 @@ namespace BachBotUCI {
                     break;
 
                 case "go":
-                    Console.Write(BoardUtility.CreateDiagram(player.board));
                     ProcessGoCommand(message);
                     break;
 
@@ -97,7 +96,6 @@ namespace BachBotUCI {
             if (!string.IsNullOrEmpty(allMoves)) {
                 string[] moveList = allMoves.Split(' ');
                 foreach (string move in moveList) {
-                    Console.WriteLine("currmove playing on board " + move);
                     player.MakeMove(move);
                 }
             }

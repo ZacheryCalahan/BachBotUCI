@@ -18,11 +18,11 @@ namespace BachBotUCI {
         }
 
         public void SetPosition(string fen) { 
-            board.loadPosition(fen);
+            board.LoadPosition(fen);
         }
 
         public void SetPosition() {
-            board.loadPosition();
+            board.LoadPosition();
         }
 
 

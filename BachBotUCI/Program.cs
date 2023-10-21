@@ -19,7 +19,6 @@ namespace BachBotUCI {
              *  Fen isn't technically fully loaded
              *  
              *  BUGS:
-             *  Engine doesn't understand castling, just thinks king moves and not the rook.
              *  Sometimes pushes pawns that aren't in the startpos forward two.
              */
         }

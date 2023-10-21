@@ -13,7 +13,10 @@ namespace BachBotUCI.Utilities {
         public static int[] EIGHTH_COLUMN = { 7, 15, 23, 31, 39, 47, 55, 63 };
 
         public static int[] SECOND_ROW = { 8, 9, 10, 11, 12, 13, 14, 15 };
-        public static int[] SEVENTH_ROW = { 40, 41, 42, 43, 44, 45, 46, 47 };
+        public static int[] SEVENTH_ROW = { 48, 49, 50, 51, 52, 53, 54, 55 };
+
+        // These are used to find a rook startposition
+        public static int[] ROOK_START_POSITIONS = { 0, 7, 56, 63 };
 
         public static int RankIndex(int squareIndex) {
             // Since a chess board is a beautiful power of two, this works.
@@ -72,7 +75,7 @@ namespace BachBotUCI.Utilities {
                 for (int x = 0; x < 8; x++) {
                     int fileIndex = blackAtTop ? x : 7 - x;
                     int squareIndex = IndexFromCoord(fileIndex, rankIndex);
-                    int piece = board.squares[squareIndex];
+                    int piece = board.Squares[squareIndex];
                     result.Append($"|({Piece.GetSymbol(piece)})");
                     if (x == 7) {
                         result.AppendLine($"| {rankIndex + 1}");

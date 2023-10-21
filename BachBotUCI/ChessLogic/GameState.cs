@@ -10,10 +10,12 @@ namespace BachBotUCI.ChessLogic {
         public readonly int castlingRights;
         public readonly int fiftyMoveCounter;
 
-        public const int ClearWhiteKingsideMask = 0b1110;
-        public const int ClearWhiteQueensideMask = 0b1101;
-        public const int ClearBlackKingsideMask = 0b1011;
-        public const int ClearBlackQueensideMask = 0b0111;
+        public const int ClearWhiteKingsideMask =  0b1110; // 0001 = white kingside castle right
+        public const int ClearWhiteQueensideMask = 0b1101; // 0010 = white queenside castle right
+        public const int ClearBlackKingsideMask =  0b1011; // 0100 = black kingside castle right
+        public const int ClearBlackQueensideMask = 0b0111; // 1000 = black queenside castle right
+
+
 
         public GameState(int capturedPieceType, int enPassantFile, int castlingRights, int fiftyMoveCounter) {
             this.capturedPieceType = capturedPieceType;
