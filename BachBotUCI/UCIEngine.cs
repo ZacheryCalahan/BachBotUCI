@@ -43,23 +43,35 @@ namespace BachBotUCI {
                 case "quit":
                     break;
 
+                // These commands are solely for debugging purposes.
+                case "undo":
+                    player.board.UnMakeMove(player.board.moveHistory.Peek());
+                    break;
                 case "d":
                     Console.Write(BoardUtility.CreateDiagram(player.board));
                     break;
 
                 case "printmoves":
-                    List<Move> moves;
-                    moves = MoveGenerator.GeneratePseudoLegalMoves(player.board);
-                    foreach (Move move in moves) {
-                        Console.WriteLine(BoardUtility.GetMoveNameUCI(move));
-                    }
-
+                    PrintMoves(player.board);
                     break;
 
                 default:
                     //Debugger.Launch();
                     break;
 
+            }
+        }
+
+        public void PrintMoves(Board board) {
+            List<Move> moves;
+            moves = MoveGenerator.GenerateLegalMoves(player.board);
+
+            foreach (Move move in moves) {
+                int piece = board.Squares[move.StartSquare];
+                char pieceSymbol = Piece.GetSymbol(Piece.PieceType(piece));
+                pieceSymbol = Piece.IsWhite(piece) ? char.ToUpper(pieceSymbol) : char.ToLower(pieceSymbol);
+                Console.Write(pieceSymbol + " : ");
+                Console.WriteLine(BoardUtility.GetMoveNameUCI(move));
             }
         }
 

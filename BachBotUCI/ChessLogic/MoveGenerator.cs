@@ -1,8 +1,30 @@
 ﻿using BachBot.ChessLogic;
 using BachBotUCI.Utilities;
+using System.ComponentModel;
 
 namespace BachBotUCI.ChessLogic {
     public static class MoveGenerator {
+
+        public static List<Move> GenerateLegalMoves(Board board) {
+            List<Move> legalMoves = new List<Move>();
+            List<Move> pseudoLegalMoves = GeneratePseudoLegalMoves(board);
+
+            foreach (Move plmove in pseudoLegalMoves) {
+                board.MakeMove(plmove);
+                List<Move> opponentResponses = GeneratePseudoLegalMoves(board);
+
+                if (opponentResponses.Any(response => response.TargetSquare == board.KingSquare[0] || response.TargetSquare == board.KingSquare[1])) {
+
+                } else {
+                    legalMoves.Add(plmove);
+                }
+
+                board.UnMakeMove(plmove);
+            }
+
+            return legalMoves;
+        }
+
         public static List<Move> GeneratePseudoLegalMoves(Board board) {
             List<Move> moves = new List<Move>();
 
@@ -119,8 +141,20 @@ namespace BachBotUCI.ChessLogic {
                 }
             }
 
-            // Calculate Castles
+            // Calculate Castles TODO check if squares are under attack.
+            
+            if (board.CurrentGameState.HasKingsideCastleRight(Piece.IsWhite(piece))) {
+                if (board.Squares[piecePosition + 1] == 0 && board.Squares[piecePosition + 2] == 0) {
+                    moves.Add(new Move(piecePosition, piecePosition + 2, Move.CastleFlag));
+                } 
+            } 
 
+            if (board.CurrentGameState.HasQueensideCastleRight(Piece.IsWhite(piece))) {
+                if (board.Squares[piecePosition - 1] == 0 && board.Squares[piecePosition - 2] == 0 && board.Squares[piecePosition - 3] == 0) {
+                    moves.Add(new Move(piecePosition, piecePosition - 2, Move.CastleFlag));
+                }
+            }
+            
 
             return moves;
         } 

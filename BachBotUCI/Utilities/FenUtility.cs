@@ -70,32 +70,32 @@ namespace BachBotUCI.Utilities {
             fen += (board.WhiteToMove) ? 'w' : 'b';
 
             // Castling Rights
-            bool whiteKingside = (board.GameState.castlingRights & 1) == 1;
-            bool whiteQueenside = (board.GameState.castlingRights >> 1 & 1) == 1;
-            bool blackKingside = (board.GameState.castlingRights >> 2 & 1) == 1;
-            bool blackQueenside = (board.GameState.castlingRights >> 3  & 1) == 1;
+            bool whiteKingside = (board.CurrentGameState.castlingRights & 1) == 1;
+            bool whiteQueenside = (board.CurrentGameState.castlingRights >> 1 & 1) == 1;
+            bool blackKingside = (board.CurrentGameState.castlingRights >> 2 & 1) == 1;
+            bool blackQueenside = (board.CurrentGameState.castlingRights >> 3  & 1) == 1;
             fen += ' ';
             fen += (whiteKingside) ? "K" : "";
             fen += (whiteQueenside) ? "Q" : "";
             fen += (blackKingside) ? "k" : "";
             fen += (blackQueenside) ? "q" : "";
-            fen += ((board.GameState.castlingRights) == 0) ? "-" : "";
+            fen += ((board.CurrentGameState.castlingRights) == 0) ? "-" : "";
 
             // Enpassant
             fen += ' ';
-            int epFileIndex = board.GameState.enPassantFile - 1;
+            int epFileIndex = board.CurrentGameState.enPassantFile - 1;
             int epRankIndex = (board.WhiteToMove) ? 5 : 2;
 
             bool isEnPassant = epFileIndex != -1;
-            if (board.GameState.enPassantFile != 0) {
-                fen += BoardUtility.fileNames.IndexOf(board.GameState.enPassantFile + 1 + "");
+            if (board.CurrentGameState.enPassantFile != 0) {
+                fen += BoardUtility.fileNames.IndexOf(board.CurrentGameState.enPassantFile + 1 + "");
             } else {
                 fen += "-";
             }
 
             // 50 Move Counter
             fen += ' ';
-            fen += board.GameState.fiftyMoveCounter;
+            fen += board.CurrentGameState.fiftyMoveCounter;
 
             // Total Move Counter
             fen += ' ';
@@ -112,7 +112,10 @@ namespace BachBotUCI.Utilities {
 
             // Gamestate
             public readonly bool whiteToMove;
-            public readonly int castlingRights = 0;
+            public readonly bool WhiteKingsideCastle = false;
+            public readonly bool WhiteQueensideCastle = false;
+            public readonly bool BlackKingsideCastle = false;
+            public readonly bool BlackQueensideCastle = false;
             public readonly int epFile = 0;
             public readonly int fiftyMovePlyCount = 0;
             public readonly int moveCount = 0;
@@ -161,16 +164,16 @@ namespace BachBotUCI.Utilities {
                     foreach (char castleChar in castleChars) {
                         switch (castleChar) {
                             case 'K':
-                                castlingRights |= 0b0001;
+                                WhiteKingsideCastle = true;
                                 break;
                             case 'Q':
-                                castlingRights |= 0b0010;
+                                WhiteQueensideCastle = true;
                                 break;
                             case 'k':
-                                castlingRights |= 0b0100;
+                                BlackKingsideCastle = true;
                                 break;
                             case 'q':
-                                castlingRights |= 0b1000;
+                                BlackQueensideCastle = true;
                                 break;
                             default:
                                 break;

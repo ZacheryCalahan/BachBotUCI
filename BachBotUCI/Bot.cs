@@ -12,7 +12,7 @@ namespace BachBotUCI {
         }
 
         public void ChooseMove() { // Generates a random move.
-            List<Move> moves = MoveGenerator.GeneratePseudoLegalMoves(board);
+            List<Move> moves = MoveGenerator.GenerateLegalMoves(board);
             var rand = new Random();
             OnSearchComplete(moves[rand.Next(moves.Count)]);
         }
